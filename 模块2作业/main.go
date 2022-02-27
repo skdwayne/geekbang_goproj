@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
+	"strings"
 )
 
 var VERSION string
@@ -34,6 +36,27 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 	//	需求2
 	w.Header().Set("VERSION", VERSION)
+	clientip := getClientIP(r)
+	log.Println("Success! Response code:", 200, "ClientIp:", clientip)
+}
+
+//	需求3
+func getClientIP(r *http.Request) string {
+	ip := r.Header.Get("X-Real-IP")
+	if ip == "" {
+		xForwardedFor := r.Header.Get("X-Forwarded-For")
+		ip = strings.TrimSpace(strings.Split(xForwardedFor, ",")[0])
+	}
+	if ip == "" {
+		ip = strings.Split(r.RemoteAddr, ":")[0]
+	}
+	if ip == "" {
+		res, _, err := net.SplitHostPort(strings.TrimSpace(r.RemoteAddr))
+		if err == nil {
+			ip = res
+		}
+	}
+	return ip
 }
 
 //	需求4
