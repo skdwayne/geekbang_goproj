@@ -1,0 +1,14 @@
+FROM golang:1.16-alpine AS build
+ENV CGO_ENABLED=0
+ENV GO111MODULE=on
+ENV GOPROXY=https://goproxy.cn,direct
+WORKDIR /httpserver/
+COPY ./httpserver ./
+RUN GOOS=linux go build -installsuffix cgo -o httpserver ./main.go
+
+
+
+FROM scratch
+COPY --from=build ./httpserver/httpserver /
+EXPOSE 8080
+ENTRYPOINT ["/httpserver"]
