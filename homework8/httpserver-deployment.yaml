@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: golang
+    release: test-go-httpserver
+  name: test-go-httpserver
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: golang
+      release: test-go-httpserver
+  template:
+    metadata:
+      labels:
+        app: golang
+        release: test-go-httpserver
+    spec:
+      containers:
+        - env:
+            - name: TZ
+              value: Asia/Shanghai
+            - name: LOG_LVL
+              valueFrom:    
+                configMapKeyRef:
+                  name: httpserver-conf
+                  key: loglevel
+          image: registry.cn-chengdu.aliyuncs.com/xcd-public/httpserver-wenxin:1.0.1
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/sh
+                  - '-c'
+                  - sh /stop.sh
+          name: main
+          ports:
+            - containerPort: 8080
+              name: httpserver
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: httpserver
+              scheme: HTTP
+            periodSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 3
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: httpserver
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 50
+            successThreshold: 1
+            timeoutSeconds: 3
+          livenessProbe:  
+            httpGet:    
+              path: /healthz    
+              port: httpserver
+              scheme: HTTP
+            initialDelaySeconds: 3  
+            periodSeconds: 3
+          resources:
+            limits:
+              cpu: 100m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: tz-config
+      terminationGracePeriodSeconds: 15
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: release
+                operator: In
+                values:
+                - test-go-httpserver
+            topologyKey: kubernetes.io/hostname
+      volumes:
+        - hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai
+          name: tz-config
