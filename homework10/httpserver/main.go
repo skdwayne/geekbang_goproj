@@ -23,7 +23,7 @@ func main() {
 		fmt.Println("SET VERSION")
 		VERSION = "unknown"
 	}
-
+	metrics.Register()
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/healthz", healthz)
