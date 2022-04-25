@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/Am2901/httpserver/src/metrics"
 	"log"
 	"math/rand"
+	//	"github.com/Am2901/httpserver/src/metrics"
+	"github.com/skdwayne/geekbang_goproj/homework10/httpserver/metrics"
+	//	"metrics"
 	"net"
 	"net/http"
 	"os"
