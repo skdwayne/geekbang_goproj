@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 	"math/rand"
 	//	"github.com/Am2901/httpserver/src/metrics"
-	"github.com/skdwayne/geekbang_goproj/homework10/httpserver/metrics"
-	//	"metrics"
+	//	"github.com/skdwayne/geekbang_goproj/homework10/httpserver/metrics"
+	"httptserver/metrics"
 	"net"
 	"net/http"
 	"os"
@@ -27,6 +28,7 @@ func main() {
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/healthz", healthz)
 	mux.HandleFunc("/images", images)
+	mux.Handle("/metrics", promhttp.Handler())
 
 	if err := http.ListenAndServe(":8080", mux); err != nil {
 		log.Fatalln("start http err:", err)

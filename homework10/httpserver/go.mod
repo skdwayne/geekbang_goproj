@@ -1,4 +1,4 @@
-module httptset
+module httptserver
 
 go 1.10
 

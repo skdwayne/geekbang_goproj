@@ -14,7 +14,7 @@ func Register() {
 }
 
 const (
-	MetricsNamespace = "cloudnative"
+	MetricsNamespace = "default"
 )
 
 // NewExecutionTimer provides a timer for Updater's RunOnce execution
