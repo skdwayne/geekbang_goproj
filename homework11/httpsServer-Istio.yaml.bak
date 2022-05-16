@@ -44,14 +44,6 @@ spec:
     - httpsserver.cncamp.io
   http:
     - match:
-        - uri:
-            exact: "/healthz"
-      route:
-        - destination:
-            host: httpserver.simple.svc.cluster.local
-            port:
-              number: 80
-    - match:
         - port: 443
       route:
         - destination:
